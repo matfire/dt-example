@@ -1,0 +1,9 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <twig:Card title="Retards journaliers">
+         <div {{svelte_component('DelayChart', {'siteId': 426, 'beginTs': 1631232000, 'endTs': 1631985872})}}></div>
+      </twig:Card>
+   </div>
+{% endblock %}
