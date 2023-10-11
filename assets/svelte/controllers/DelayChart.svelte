@@ -114,7 +114,7 @@
     $: if (delayThreshold || advanceThreshold) {
         colorBars();
     }
-    $: onMount(async () => {
+    onMount(async () => {
         await loadData(siteId, beginTs, endTs);
         chart = new Chart(document.getElementById("delay-chart"), options);
         const begDate = new Date(beginTs * 1000);

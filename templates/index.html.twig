@@ -5,5 +5,8 @@
       <twig:Card title="Retards journaliers">
          <div {{svelte_component('DelayChart', {'siteId': 426, 'beginTs': 1631232000, 'endTs': 1631985872})}}></div>
       </twig:Card>
+      <twig:Card title="Prise de courses">
+         <div {{svelte_component('DailyRuns', {'siteId': 426, 'beginTs': 1631232000})}}></div>
+      </twig:Card>
    </div>
 {% endblock %}
