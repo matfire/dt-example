@@ -7,46 +7,39 @@
     export let beginTs;
     export let siteId;
     let loading = true
-    let canvasId = "daily_runs-chart"
+    let canvasId = "connected_boxes-chart"
     let chart;
     let selectedDate = "";
 
     let options = {
-        type: 'line',
+        type: 'doughnut',
         data: {
-            labels: [],
+            labels: ["Connecté", "Deconnecté"],
             datasets: [
                 {
-                    label: "Instanciation",
-                    borderColor: "green",
-                    data: []
+                    backgroundColor:["green", "red"],
+                    data: [0, 0]
                 },
-                {
-                    label: "Planification",
-                    borderColor: "red",
-                    data: []
-                }
             ]
         } 
     }
 
-    let slots = {
-        instanciated: new Map(),
-        planned: new Map()
-    }
 
     async function loadData(siteId, ts) {
-        const res = await fetch(`/api/cch/daily?siteId=${siteId}&dayTs=${ts}`)
+        const res = await fetch(`/api/box/daily?siteId=${siteId}&dayTs=${ts}`)
         const data = await res.json();
-        slots.instanciated.clear();
-        slots.planned.clear();
-        data.instanciated.forEach((el) => {
-            const elDate = new Date(el.CCH_CreationDate * 1000)
-            const key = `${elDate.getHours()}:${elDate.getMinutes() > 30 ? "30" : "00"}`
-            slots.instanciated.set(key, slots.instanciated.has(key) ? (slots.instanciated.get(key) + 1) : 1);
+        const date = new Date(selectedDate);
+        options.data.datasets[0].data[0] = 0;
+        options.data.datasets[0].data[1] = 0;
+        console.log(data.boxes)
+        data.boxes.forEach((el) => {
+            const elDate = new Date(el.BOX_LastComDate * 1000)
+            if (elDate.toDateString() >= date.toDateString()) {
+                options.data.datasets[0].data[0]++
+            } else {
+                options.data.datasets[0].data[1]++
+            }
         })
-        options.data.labels = Array.from(slots.instanciated.keys())
-        options.data.datasets[0].data = Array.from(slots.instanciated.values())
     }
 
     async function handleDateSelect() {
