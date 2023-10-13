@@ -29,12 +29,13 @@
         const res = await fetch(`/api/box/daily?siteId=${siteId}&dayTs=${ts}`)
         const data = await res.json();
         const date = new Date(selectedDate);
+        date.setHours(23, 59, 59);
         options.data.datasets[0].data[0] = 0;
         options.data.datasets[0].data[1] = 0;
-        console.log(data.boxes)
         data.boxes.forEach((el) => {
             const elDate = new Date(el.BOX_LastComDate * 1000)
-            if (elDate.toDateString() >= date.toDateString()) {
+            console.log(elDate.toDateString(), date.toDateString(), elDate.getTime() >= date.getTime())
+            if (elDate.getTime() >= date.getTime()) {
                 options.data.datasets[0].data[0]++
             } else {
                 options.data.datasets[0].data[1]++
@@ -51,8 +52,6 @@
     }
 
     onMount(async() => {
-        await loadData(siteId, beginTs);
-        chart = new Chart(document.getElementById(canvasId), options);
         const begDate = new Date(beginTs * 1000);
         selectedDate = `${begDate.getFullYear()}-${(begDate.getMonth() + 1)
             .toString()
@@ -60,6 +59,8 @@
             .getDate()
             .toString()
             .padStart(2, "0")}`;
+        await loadData(siteId, beginTs);
+        chart = new Chart(document.getElementById(canvasId), options);
         loading = false;
     })
 </script>
