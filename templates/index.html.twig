@@ -3,13 +3,13 @@
 {% block body %}
    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <twig:Card title="Retards journaliers">
-         <div {{svelte_component('DelayChart', {'siteId': 426, 'beginTs': 1631232000, 'endTs': 1631985872})}}></div>
+         <div {{svelte_component('DelayChart', {'siteId': 425, 'beginTs': 1631232000, 'endTs': 1631985872})}}></div>
       </twig:Card>
       <twig:Card title="Prise de courses">
-         <div {{svelte_component('DailyRuns', {'siteId': 426, 'beginTs': 1631232000})}}></div>
+         <div {{svelte_component('DailyRuns', {'siteId': 425, 'beginTs': 1631232000})}}></div>
       </twig:Card>
             <twig:Card title="Materiel Connecté">
-         <div {{svelte_component('ConnectedBoxes', {'siteId': 426, 'beginTs': 1631232000})}}></div>
+         <div {{svelte_component('ConnectedBoxes', {'siteId': 425, 'disconnectedFactor': 2})}}></div>
       </twig:Card>
    </div>
 {% endblock %}
