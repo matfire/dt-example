@@ -208,7 +208,8 @@ class Box implements JsonSerializable
     {
         return [
             "BOX_ID" => $this->getBOXID(),
-            "BOX_LastComDate" => $this->getBOXLastComDate()
+            "BOX_LastComDate" => $this->getBOXLastComDate(),
+            "BOX_TransmissionSampleRate" => $this->getBOXTransmissionSampleRate()
         ];
     }
 
