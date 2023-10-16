@@ -22,26 +22,19 @@ class LvbRepository extends ServiceEntityRepository
         parent::__construct($registry, Lvb::class);
     }
 
-    public function findActiveOnDate(int $siteId, DateTime $date) {
-        $min = clone $date;
-        $max = clone $date;
-        $min = $min->setTime(0,0,0)->getTimestamp();
-        $max = $max->setTime(23,59,59)->getTimestamp();
+    public function findActiveOnDate(int $siteId, int $date) {
 
         $query = $this->createQueryBuilder('l');
         $condition = $query->expr()->andX();
-        $minSide = $query->expr()->orX();
-        $minSide->add('l.LVB_DateIn > :min');
-        $minSide->add('l.LVB_DateIn = 0');
         $maxSide = $query->expr()->orX();
-        $maxSide->add('l.LVB_DateOut < :max');
+        $maxSide->add('l.LVB_DateOut < :date');
         $maxSide->add('l.LVB_DateOut = 0');
-        $condition->add($minSide);
+        $condition->add('l.LVB_DateIn < :date');
         $condition->add($maxSide);
         $queryObj = $query
         ->where($condition)
         ->andWhere('l.SIT_ID = :sit_id')
-        ->setParameters(['sit_id' => $siteId, 'min' => $min, 'max' => $max])
+        ->setParameters(['sit_id' => $siteId, 'date' => $date])
         ->getQuery();
         return $queryObj->getResult();
     }
