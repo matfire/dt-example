@@ -32,6 +32,7 @@
         "apexcharts": "^3.43.0",
         "chartjs-plugin-zoom": "^2.0.1",
         "flowbite": "^1.8.1",
+        "luxon": "^3.4.3",
         "svelte-apexcharts": "^1.0.2",
         "svelte-chartjs": "^3.1.2"
     }
