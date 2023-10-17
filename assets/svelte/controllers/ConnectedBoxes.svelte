@@ -24,36 +24,32 @@
     }
 
 
-    async function loadData(siteId) {
+    async function loadData() {
+        loading = true;
         const date = DateTime.now().setZone("GMT");
         const ts = Math.floor(date.toMillis() / 1000);
-        console.log(ts)
         const res = await fetch(`/api/box/daily?siteId=${siteId}&dayTs=${ts}`)
         const data = await res.json();
         options.data.datasets[0].data[0] = 0;
         options.data.datasets[0].data[1] = 0;
-        console.log(data)
         data.boxes.forEach((el) => {
             const elDate = DateTime.fromSeconds(parseInt(el.BOX_LastComDate), {zone:"GMT"})
             const frequency = parseInt(el.BOX_TransmissionSampleRate)
-            if (elDate + (frequency * disconnectedFactor) < date) {
+            if (date.toSeconds() - elDate.toSeconds() > frequency * disconnectedFactor) {
                 options.data.datasets[0].data[1]++
             } else {
                 options.data.datasets[0].data[0]++
             }
         })
-    }
+        if (chart) {
+            chart.update()
+            loading = false;
+        }
 
-    async function handleDateSelect() {
-        loading = true;
-        const ts = new Date(selectedDate).getTime() / 1000
-        await loadData(siteId, ts);
-        chart.update()
-        loading = false;
     }
 
     onMount(async() => {
-        await loadData(siteId);
+        await loadData();
         chart = new Chart(document.getElementById(canvasId), options);
         loading = false;
     })
@@ -65,4 +61,9 @@
         <LoadingScreen />
     {/if}
     <canvas id={canvasId} />
-</div>
+    <button
+    type="button"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+    disabled={loading}
+    on:click={loadData}>Mettre à jour</button
+></div>
