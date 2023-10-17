@@ -22,7 +22,7 @@ class BoxAPIController extends AbstractController {
                 array_push($boxes, $box[0]);
             }
         }
-        return $this->json(['lvbs' => $lvbs, 'boxes' => $boxes]);
+        return $this->json(['boxes' => $boxes]);
 
     }
 }
