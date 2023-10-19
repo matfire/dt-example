@@ -1,21 +1,15 @@
 <script>
     import { onMount } from "svelte";
     import Chart from "chart.js/auto";
-    import zoomPlugin from "chartjs-plugin-zoom";
     import Input from "../components/Input.svelte";
     import LoadingScreen from "../components/LoadingScreen.svelte";
-
-    Chart.register(zoomPlugin);
+    import { DateTime } from "luxon";
 
     export let siteId;
-    export let beginTs;
-    export let endTs;
 
     let loading = true;
     let delayThreshold = null;
     let advanceThreshold = null;
-    let beginDate = "";
-    let endDate = "";
     let canvasId = "delay-chart"
     let options = {
         type: "bar",
@@ -27,58 +21,98 @@
                     data: [],
                 },
                 {
+                    label: "à l'heure",
+                    data: []
+                },
+                {
                     label: "avances",
                     data: [],
                 },
             ],
         },
         options: {
-            plugins: {
-                zoom: {
-                    zoom: {
-                        wheel: {
-                            enabled: true,
-                        },
-                        pinch: {
-                            enabled: true,
-                        },
-                        mode: "xy",
-                    },
+            scales: {
+                x: {
+                    stacked: true
                 },
-            },
-        },
+                y: {
+                    max: 100,
+                    stacked: true
+                }
+            }
+        }
     };
     let chart;
 
-    async function loadData(siteId, begin, end) {
+    async function loadData() {
+        loading = true
+        const begin = DateTime.now().setZone("GMT")
         const res = await fetch(
-            `/api/lcdv/range?siteId=${siteId}&beginTs=${begin}&endTs=${end}`
+            `/api/lcdv/range?siteId=${siteId}&dayTs=${1693785600}`
         );
         const data = await res.json();
         options.data.labels = data.res.labels;
         const delays = [];
         const advances = [];
+        const onTime = []
         data.res.data.forEach((day) => {
             let dayDelay = 0;
             let dayAdvance = 0;
+            let dayOnTime = 0;
             day.forEach((point) => {
-                if (point.LCDV_DateInDelay < 0) {
-                    dayAdvance += point.LCDV_DateInDelay;
+                const entryKey = point.LCDV_DateDo != 0 ? "LCDV_DateDo" : "LCDV_DateIn"
+                const entryDelay = `${entryKey}Delay`
+                const exit = point.LCDV_DateDone != 0 ? "LCDV_DateDone" : "LCDV_DateOut"
+                const exitDelay = point.LCDV_DateDoneDelay != 0 ? "LCDV_DateDoneDelay" : undefined
+                if (point.LCDV_DateDo === 0 && point.LCDV_DateIn === 0 && point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
+                    console.log("invalid circuit, skipped")
+                    return;
+                }
+                if (!exitDelay) {
+                    return;
+                }
+                if (point[entryDelay] < 0 && point[exitDelay] >= 0) {
+                    dayOnTime++;
+                    return;
+                }
+                if (point.LCDV_DateIn === 0 && point.LCDV_DateDo === 0) {
+                    if (point.LCDV_DateDoneDelay > 0) {
+                        dayDelay++;
+                    } else {
+                        dayAdvance++;
+                    }
+                }
+                if (point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
+                    return
+                }
+                if (point[exitDelay] > 0) {
+                    dayDelay++;
                 } else {
-                    dayDelay += point.LCDV_DateInDelay;
+                    dayAdvance++;
                 }
             });
-            delays.push(dayDelay / 60);
-            advances.push(Math.abs(dayAdvance / 60));
+            const totalDay = dayDelay + dayAdvance + dayOnTime
+            delays.push((dayDelay * 100 / totalDay).toFixed(2));
+            advances.push((dayAdvance * 100 / totalDay).toFixed(2));
+            onTime.push((dayOnTime * 100 / totalDay).toFixed(2));
         });
         options.data.datasets[0].data = [...delays];
-        options.data.datasets[1].data = [...advances];
+        options.data.datasets[1].data = [...onTime];
+        options.data.datasets[2].data = [...advances];
         options.data.datasets[0].backgroundColor = Array(
             options.data.datasets[0].data.length
         ).fill("gray");
         options.data.datasets[1].backgroundColor = Array(
             options.data.datasets[1].data.length
         ).fill("gray");
+        options.data.datasets[2].backgroundColor = Array(
+            options.data.datasets[2].data.length
+        ).fill("gray");
+        if (chart) {
+            colorBars()
+            chart.update()
+            loading = false;
+        }
     }
 
     function colorBars() {
@@ -97,38 +131,12 @@
         chart.update();
     }
 
-    async function handleDateSelect() {
-        if (new Date(beginDate).getTime() > new Date(endDate).getTime()) {
-            alert(
-                "la date de début de selection ne peut pas être supérieure à la date de fin de selection"
-            );
-            return;
-        }
-        loading = true;
-        const beTs = new Date(beginDate).getTime() / 1000;
-        const enTs = new Date(endDate).getTime() / 1000;
-        await loadData(siteId, beTs, enTs);
-        colorBars();
-        loading = false;
-    }
-
     $: if (delayThreshold || advanceThreshold) {
         colorBars();
     }
     onMount(async () => {
-        await loadData(siteId, beginTs, endTs);
+        await loadData();
         chart = new Chart(document.getElementById(canvasId), options);
-        const begDate = new Date(beginTs * 1000);
-        const enDate = new Date(endTs * 1000);
-        beginDate = `${begDate.getFullYear()}-${(begDate.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}-${begDate
-            .getDate()
-            .toString()
-            .padStart(2, "0")}`;
-        endDate = `${enDate.getFullYear()}-${(enDate.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}-${enDate.getDate().toString().padStart(2, "0")}`;
         loading = false;
     });
 </script>
@@ -137,16 +145,6 @@
     {#if loading}
         <LoadingScreen />
     {/if}
-    <div class="w-full flex justify-between">
-        <Input label="Début sélection" type="date" bind:value={beginDate} />
-        <Input label="Fin sélection" type="date" bind:value={endDate} />
-        <button
-            type="button"
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            disabled={loading}
-            on:click={handleDateSelect}>Filtrer</button
-        >
-    </div>
     <div class="w-full flex justify-between">
         <Input label="seuil rétard" type="number" bind:value={delayThreshold} />
         <Input

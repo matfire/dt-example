@@ -44,17 +44,13 @@ class LcdvRepository extends ServiceEntityRepository
     /**
      * @return Lcdv[]
      */
-    public function findBySitIdDaily($sitId, DateTime $date): array
+    public function findBySitIdDaily($sitId, int $min, $max): array
     {
-        $minDate = clone $date;
-        $minDate = $minDate->setTime(0, 0, 0);
-        $maxDate = clone $date;
-        $maxDate = $maxDate->setTime(23, 59, 59);
         return $this->createQueryBuilder('p')
             ->andWhere('p.SIT_ID = :sitId')
             ->andWhere('p.LCDV_DateIn > :minDate')
             ->andWhere('p.LCDV_DateIn < :maxDate')
-            ->setParameters(['sitId' => $sitId, 'minDate' => $minDate->getTimestamp(), 'maxDate' => $maxDate->getTimestamp()])
+            ->setParameters(['sitId' => $sitId, 'minDate' => $min, 'maxDate' => $max])
             ->getQuery()
             ->getResult();
     }

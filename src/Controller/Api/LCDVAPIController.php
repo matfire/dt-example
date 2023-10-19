@@ -15,21 +15,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class LCDVAPIController extends AbstractController
 {
     #[Route('/range')]
-    public function range(#[MapQueryParameter] int $siteId, #[MapQueryParameter] string $beginTs, #[MapQueryParameter] string $endTs, LcdvRepository $repository): JsonResponse
+    public function range(#[MapQueryParameter] int $siteId, #[MapQueryParameter] string $dayTs, LcdvRepository $repository): JsonResponse
     {
-        $beginDate = new DateTime();
         $endDate = new DateTime();
-        $beginDate->setTimestamp(intval($beginTs));
-        $beginDate->setTime(0, 0, 0);
-        $endDate->setTimestamp(intval($endTs));
-        $endDate->setTime(23, 59, 59);
-        $res = ["labels" => [], "data" => []];
-        do {
-            array_push($res["labels"], $beginDate->format("d-m-Y"));
-            $data = $repository->findBySitIdDaily($siteId, $beginDate);
-            array_push($res["data"], $data);
-            $beginDate->modify("+1 day");
-        } while ($beginDate->format("Ymd") <= $endDate->format("Ymd"));
+        $endDate->setTimestamp(intval($dayTs));
+        $beginDate = clone $endDate;
+        $beginDate = $beginDate->modify("-1 week");
+        $beginDate->setTime(0,0,0);
+        $res = ['labels' => [], "data" => []];
+        $elements = $repository->findBySitIdDaily($siteId, $beginDate->getTimestamp(), $endDate->getTimestamp());
+        $currentDay = [];
+        foreach ($elements as $el) {
+            $elDate = new DateTime();
+            $elDate = $elDate->setTimestamp(intval($el->getLCDVDatein()));
+            if (!in_array($elDate->format("d-m-Y"), $res["labels"])) {
+                array_push($res["labels"], $elDate->format("d-m-Y"));
+                array_push($res["data"], $currentDay);
+                $currentDay = [$el];
+            } else {
+                array_push($currentDay, $el);
+            }
+        }
         return $this->json(['status' => 'ok', 'res' => $res]);
     }
 }
