@@ -8,9 +8,10 @@
     export let siteId;
 
     let loading = true;
-    let delayThreshold = null;
-    let advanceThreshold = null;
+    export let delayThreshold = 0;
+    export let advanceThreshold = 0;
     let canvasId = "delay-chart"
+    let canvasData = {};
     let options = {
         type: "bar",
         data: {
@@ -19,14 +20,17 @@
                 {
                     label: "retards",
                     data: [],
+                    backgroundColor: "orange"
                 },
                 {
                     label: "à l'heure",
-                    data: []
+                    data: [],
+                    backgroundColor: "green"
                 },
                 {
                     label: "avances",
                     data: [],
+                    backgroundColor: "red"
                 },
             ],
         },
@@ -44,18 +48,12 @@
     };
     let chart;
 
-    async function loadData() {
-        loading = true
-        const begin = DateTime.now().setZone("GMT")
-        const res = await fetch(
-            `/api/lcdv/range?siteId=${siteId}&dayTs=${1693785600}`
-        );
-        const data = await res.json();
-        options.data.labels = data.res.labels;
+    function fillChart() {
+        options.data.labels = canvasData.res.labels;
         const delays = [];
         const advances = [];
         const onTime = []
-        data.res.data.forEach((day) => {
+        canvasData.res.data.forEach((day) => {
             let dayDelay = 0;
             let dayAdvance = 0;
             let dayOnTime = 0;
@@ -71,21 +69,21 @@
                 if (!exitDelay) {
                     return;
                 }
-                if (point[entryDelay] < 0 && point[exitDelay] >= 0) {
+                if (point[entryDelay] < -1 * advanceThreshold && point[exitDelay] >= delayThreshold) {
                     dayOnTime++;
                     return;
                 }
                 if (point.LCDV_DateIn === 0 && point.LCDV_DateDo === 0) {
-                    if (point.LCDV_DateDoneDelay > 0) {
+                    if (point.LCDV_DateDoneDelay > delayThreshold) {
                         dayDelay++;
-                    } else {
+                    } else if (point.LCDV_DateDoneDelay < -1 * advanceThreshold) {
                         dayAdvance++;
                     }
                 }
                 if (point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
                     return
                 }
-                if (point[exitDelay] > 0) {
+                if (point[exitDelay] > delayThreshold) {
                     dayDelay++;
                 } else {
                     dayAdvance++;
@@ -99,40 +97,26 @@
         options.data.datasets[0].data = [...delays];
         options.data.datasets[1].data = [...onTime];
         options.data.datasets[2].data = [...advances];
-        options.data.datasets[0].backgroundColor = Array(
-            options.data.datasets[0].data.length
-        ).fill("gray");
-        options.data.datasets[1].backgroundColor = Array(
-            options.data.datasets[1].data.length
-        ).fill("gray");
-        options.data.datasets[2].backgroundColor = Array(
-            options.data.datasets[2].data.length
-        ).fill("gray");
         if (chart) {
-            colorBars()
             chart.update()
             loading = false;
         }
     }
 
-    function colorBars() {
-        if (delayThreshold) {
-            options.data.datasets[0].backgroundColor =
-                options.data.datasets[0].data.map((el) =>
-                    el > delayThreshold ? "orange" : "green"
-                );
-        }
-        if (advanceThreshold) {
-            options.data.datasets[1].backgroundColor =
-                options.data.datasets[1].data.map((el) =>
-                    el > advanceThreshold ? "red" : "blue"
-                );
-        }
-        chart.update();
+    async function loadData() {
+        loading = true
+        const begin = DateTime.now().setZone("GMT")
+        const res = await fetch(
+            `/api/lcdv/range?siteId=${siteId}&dayTs=${1693785600}`
+        );
+        const data = await res.json();
+        canvasData = data;
+        fillChart()
+        
     }
 
     $: if (delayThreshold || advanceThreshold) {
-        colorBars();
+        fillChart();
     }
     onMount(async () => {
         await loadData();
