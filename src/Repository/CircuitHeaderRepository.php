@@ -31,19 +31,28 @@ class CircuitHeaderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByProfileAndDate(int $sit_id, int $profile, DateTime $date) {
-        $min = clone $date;
-        $min = $min->setTime(0,0,0)->getTimestamp();
-        $max = clone $date;
-        $max = $max->setTime(23,59,59)->getTimestamp();
-
-        return $this->createQueryBuilder('c')
+    /**
+     * @return CircuitHeader[]
+     */
+    public function findByProfileAndDate(int $sit_id, int $profile, int $begTs, int $endTs) {
+        $query = $this->createQueryBuilder('c')
             ->andWhere('c.SIT_ID = :sit_id')
-            ->andWhere('c.CCH_Profile = :profile')
-            ->andWhere('c.CCH_CreationDate > :min')
-            ->andWhere('c.CCH_CreationDate < :max')
-            ->orderBy('c.CCH_CreationDate', "asc")
-            ->setParameters(['sit_id' => $sit_id, 'profile' => $profile, 'min' => $min, 'max' => $max])
+            ->andWhere('c.CCH_Profile = :profile');
+        if ($profile == 0) {
+            $query->andWhere('c.CCH_CreationDate > :min')
+                ->andWhere('c.CCH_CreationDate < :max');
+        } else {
+            $minCondition = $query->expr()->orX()
+                ->add("c.CCH_DateValMin = 0")
+                ->add("c.CCH_DateValMin > :min");
+            $maxCondition = $query->expr()->orX()
+                ->add("c.CCH_DateValMax = 0")
+                ->add("c.CCH_DateValMax < :max");
+            $query->andWhere($minCondition)
+                ->andWhere($maxCondition);
+        }
+            
+        return $query->setParameters(['sit_id' => $sit_id, 'profile' => $profile, 'min' => $begTs, 'max' => $endTs])
             ->getQuery()
             ->getResult();
     }
