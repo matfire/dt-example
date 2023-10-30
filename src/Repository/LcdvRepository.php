@@ -55,6 +55,39 @@ class LcdvRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Lcdv[]
+     */
+    public function findbyCCDID($ccdId) {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.CCD_ID = :id')
+            ->setParameter('id', $ccdId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Lcdv[]
+     */
+    public function findByVHCList($ids) {
+        return $this->createQueryBuilder('p')
+        ->andWhere('p.VHC_ID in (:ids)')
+        ->setParameter('ids', $ids)
+        ->getQuery()
+        ->getResult();
+    }
+
+    /**
+     * @return Lcdv[]
+     */
+    public function findByCCDIDList($ids) {
+        return $this->createQueryBuilder('p')
+        ->andWhere('p.CCD_ID in (:ids)')
+        ->setParameter('ids', $ids)
+        ->getQuery()
+        ->getResult(); 
+    }
+
     //    /**
     //     * @return Lcdv[] Returns an array of Lcdv objects
     //     */

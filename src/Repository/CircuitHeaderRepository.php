@@ -37,7 +37,8 @@ class CircuitHeaderRepository extends ServiceEntityRepository
     public function findByProfileAndDate(int $sit_id, int $profile, int $begTs, int $endTs) {
         $query = $this->createQueryBuilder('c')
             ->andWhere('c.SIT_ID = :sit_id')
-            ->andWhere('c.CCH_Profile = :profile');
+            ->andWhere('c.CCH_Profile = :profile')
+            ->andWhere('c.CCH_AppData NOT LIKE \'%<IGNORE>1</IGNORE>%\'');
         if ($profile == 0) {
             $query->andWhere('c.CCH_CreationDate > :min')
                 ->andWhere('c.CCH_CreationDate < :max');

@@ -10,7 +10,7 @@
     let loading = true;
     export let delayThreshold = 0;
     export let advanceThreshold = 0;
-    let canvasId = "delay-chart"
+    let canvasId = "delay-chart";
     let canvasData = {};
     let options = {
         type: "bar",
@@ -20,31 +20,31 @@
                 {
                     label: "retards",
                     data: [],
-                    backgroundColor: "orange"
+                    backgroundColor: "orange",
                 },
                 {
                     label: "à l'heure",
                     data: [],
-                    backgroundColor: "green"
+                    backgroundColor: "green",
                 },
                 {
                     label: "avances",
                     data: [],
-                    backgroundColor: "red"
+                    backgroundColor: "red",
                 },
             ],
         },
         options: {
             scales: {
                 x: {
-                    stacked: true
+                    stacked: true,
                 },
                 y: {
                     max: 100,
-                    stacked: true
-                }
-            }
-        }
+                    stacked: true,
+                },
+            },
+        },
     };
     let chart;
 
@@ -52,67 +52,80 @@
         options.data.labels = canvasData.res.labels;
         const delays = [];
         const advances = [];
-        const onTime = []
+        const onTime = [];
         canvasData.res.data.forEach((day) => {
             let dayDelay = 0;
             let dayAdvance = 0;
             let dayOnTime = 0;
             day.forEach((point) => {
-                const entryKey = point.LCDV_DateDo != 0 ? "LCDV_DateDo" : "LCDV_DateIn"
-                const entryDelay = `${entryKey}Delay`
-                const exit = point.LCDV_DateDone != 0 ? "LCDV_DateDone" : "LCDV_DateOut"
-                const exitDelay = point.LCDV_DateDoneDelay != 0 ? "LCDV_DateDoneDelay" : undefined
-                if (point.LCDV_DateDo === 0 && point.LCDV_DateIn === 0 && point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
-                    console.log("invalid circuit, skipped")
-                    return;
-                }
-                if (!exitDelay) {
-                    return;
-                }
-                if (point[entryDelay] < -1 * advanceThreshold && point[exitDelay] >= delayThreshold) {
+                const entry =
+                    point.LCDV_DateDo !== 0
+                        ? point.LCDV_DateDoDelay
+                        : point.LCDV_DateInDelay;
+                const exit =
+                    point.LCDV_DateDone !== 0
+                        ? point.LCDV_DateDoneDelay
+                        : point.LCDV_DateOut;
+
+                if (
+                    entry < 0 /*&& Math.abs(entry) >= advanceThreshold */ &&
+                    exit > 0 /*&& exit >= delayThreshold*/
+                ) {
                     dayOnTime++;
                     return;
                 }
+                // circuit start
                 if (point.LCDV_DateIn === 0 && point.LCDV_DateDo === 0) {
-                    if (point.LCDV_DateDoneDelay > delayThreshold) {
+                    if (exit >= delayThreshold) {
                         dayDelay++;
-                    } else if (point.LCDV_DateDoneDelay < -1 * advanceThreshold) {
+                    } else if (Math.abs(exit) >= advanceThreshold) {
                         dayAdvance++;
+                    } else {
+                        dayOnTime++;
+                    }
+                    return;
+                }
+                // circuit end
+                if (point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
+                    if (entry >= delayThreshold) {
+                        dayDelay++;
+                    } else if (Math.abs(entry) >= advanceThreshold) {
+                        dayAdvance++;
+                    } else {
+                        dayOnTime++;
                     }
                 }
-                if (point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
-                    return
-                }
-                if (point[exitDelay] > delayThreshold) {
+                if (exit > 0 && exit >= delayThreshold) {
                     dayDelay++;
-                } else {
+                } else if (exit < 0 && Math.abs(exit) >= advanceThreshold) {
                     dayAdvance++;
+                } else {
+                    dayOnTime++;
                 }
             });
-            const totalDay = dayDelay + dayAdvance + dayOnTime
-            delays.push((dayDelay * 100 / totalDay).toFixed(2));
-            advances.push((dayAdvance * 100 / totalDay).toFixed(2));
-            onTime.push((dayOnTime * 100 / totalDay).toFixed(2));
+            const totalDay = dayDelay + dayAdvance + dayOnTime;
+            delays.push(((dayDelay * 100) / totalDay).toFixed(2));
+            advances.push(((dayAdvance * 100) / totalDay).toFixed(2));
+            onTime.push(((dayOnTime * 100) / totalDay).toFixed(2));
         });
         options.data.datasets[0].data = [...delays];
         options.data.datasets[1].data = [...onTime];
         options.data.datasets[2].data = [...advances];
         if (chart) {
-            chart.update()
+            chart.update();
             loading = false;
         }
     }
 
     async function loadData() {
-        loading = true
-        const begin = DateTime.now().setZone("GMT")
+        loading = true;
+        const begin = DateTime.now().setZone("GMT");
         const res = await fetch(
             `/api/lcdv/range?siteId=${siteId}&dayTs=${1693785600}`
         );
         const data = await res.json();
         canvasData = data;
-        fillChart()
-        
+        fillChart();
     }
 
     $: if (delayThreshold || advanceThreshold) {

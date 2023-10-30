@@ -28,7 +28,6 @@ class CircuitDetailRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->andWhere('c.CCH_ID = :cch_id')
             ->setParameter('cch_id', $cch_id)
-            ->orderBy("c.CCD_Step", "ASC")
             ->getQuery()
             ->getResult();
     }
