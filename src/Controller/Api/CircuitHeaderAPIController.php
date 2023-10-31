@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\CircuitHeader;
 use App\Repository\CircuitHeaderRepository;
 use App\Repository\TimingAppRulesRepository;
 use App\Utils\TimingAppRulesUtils;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/cch')]
 class CircuitHeaderAPIController extends AbstractController
 {
-    #[Route("/daily")]
+    #[Route("/range")]
     public function daily(#[MapQueryParameter] int $siteId, #[MapQueryParameter] int $dayTs, CircuitHeaderRepository $headerRepository, TimingAppRulesRepository $appRulesRepository): JsonResponse
     {
         set_time_limit(0);
@@ -29,7 +30,7 @@ class CircuitHeaderAPIController extends AbstractController
         $res = ["labels" => [], "instanciated" => [], "planned" => []];
         //generate labels
         $tmpDate = clone $beginDate;
-        for ($i = 0; $i < 8; $i++) {
+        while ($tmpDate < $endDate) {
             array_push($res["labels"], $tmpDate->format("d-m-Y"));
             array_push($res["instanciated"], 0);
             array_push($res["planned"], 0);
@@ -53,8 +54,11 @@ class CircuitHeaderAPIController extends AbstractController
             $maxDay = new DateTime($day, new DateTimeZone("GMT"));
             $minDay = $minDay->setTime(0, 0, 0)->getTimestamp();
             $maxDay = $maxDay->setTime(23, 59, 59)->getTimestamp();
-            $validHeaders = array_filter($planned, function ($el) use ($minDay, $maxDay) {
-                return true;
+            $validHeaders = array_filter($planned, function (CircuitHeader $el) use ($minDay, $maxDay) {
+                $min = $el->getCCHDateValMin();
+                $max = $el->getCCHDateValMax();
+                //todo add upper limit
+                return ($min > $minDay || $min == 0) ;
             });
             foreach ($validHeaders as $header) {
                 $linkedTars = array_filter($tars, function ($el) use ($header) {

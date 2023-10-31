@@ -9,7 +9,6 @@
     let loading = true;
     let canvasId = "daily_runs-chart";
     let chart;
-    let selectedDate = "";
 
     let options = {
         type: "bar",
@@ -34,7 +33,7 @@
                     stacked: true,
                 },
                 y: {
-                    //max: 100,
+                    max: 100,
                     stacked: true,
                 },
             },
@@ -44,11 +43,14 @@
     async function loadData() {
         loading = true;
         const date = DateTime.now().setZone("GMT");
-        const ts = date.toSeconds();
+        const ts = date.toUnixInteger();
         const res = await fetch(
-            `/api/cch/daily?siteId=${siteId}&dayTs=${1693785600}`
+            `/api/cch/range?siteId=${siteId}&dayTs=${1693785600}`
         );
         const data = await res.json();
+        console.log(data)
+        options.data.datasets[0].data = [];
+        options.data.datasets[1].data = [];
         data.labels.forEach((_, idx) => {
             const instanciated = data.instanciated[idx];
             const planned = data.planned[idx];
@@ -58,13 +60,7 @@
             options.data.datasets[0].data.push(100 - percent);
             options.data.datasets[1].data.push(percent);
         });
-        /*         data.instanciated.forEach((el) => {
-            const elDate = new Date(el.CCH_CreationDate * 1000)
-            const key = `${elDate.getHours()}:${elDate.getMinutes() > 30 ? "30" : "00"}`
-            slots.instanciated.set(key, slots.instanciated.has(key) ? (slots.instanciated.get(key) + 1) : 1);
-        }) */
         options.data.labels = data.labels;
-        //options.data.datasets[0].data = Array.from(slots.instanciated.values())
         if (chart) {
             chart.update();
             loading = false;
@@ -74,13 +70,6 @@
     onMount(async () => {
         await loadData(siteId, beginTs);
         chart = new Chart(document.getElementById(canvasId), options);
-        const begDate = new Date(beginTs * 1000);
-        selectedDate = `${begDate.getFullYear()}-${(begDate.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}-${begDate
-            .getDate()
-            .toString()
-            .padStart(2, "0")}`;
         loading = false;
     });
 </script>
