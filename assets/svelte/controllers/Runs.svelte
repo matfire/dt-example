@@ -55,8 +55,7 @@
             const instanciated = data.instanciated[idx];
             const planned = data.planned[idx];
             const percent =
-                planned === 0 ? 0 : ((instanciated * 100) / planned).toFixed(2);
-            console.log(planned);
+                planned === 0 ? 0 : Math.min(100, (instanciated * 100) / planned).toFixed(2);
             options.data.datasets[0].data.push(100 - percent);
             options.data.datasets[1].data.push(percent);
         });
