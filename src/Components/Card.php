@@ -9,4 +9,5 @@ use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 class Card
 {
     public string $title;
+    public string $link = "#";
 }
