@@ -6,9 +6,9 @@
          <div {{svelte_component('DelayChart', {'siteId': 425, 'beginTs': 1631232000, 'endTs': 1631985872})}}></div>
       </twig:Card>
       <twig:Card title="Prise de courses">
-         <div {{svelte_component('DailyRuns', {'siteId': 425, 'beginTs': 1631232000})}}></div>
+         <div {{svelte_component('Runs', {'siteId': 425, 'beginTs': 1631232000})}}></div>
       </twig:Card>
-            <twig:Card title="Materiel Connecté">
+      <twig:Card title="Materiel Connecté" link="/resources/box">
          <div {{svelte_component('ConnectedBoxes', {'siteId': 425, 'disconnectedFactor': 2})}}></div>
       </twig:Card>
    </div>
