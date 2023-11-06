@@ -6,7 +6,7 @@ use App\Repository\CircuitDetailRepository;
 use App\Repository\CircuitHeaderRepository;
 use App\Repository\LcdvRepository;
 use DateTime;
-
+use DateTimeZone;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -19,8 +19,9 @@ class LCDVAPIController extends AbstractController
     public function range(#[MapQueryParameter] int $siteId, #[MapQueryParameter] string $dayTs, LcdvRepository $repository, CircuitHeaderRepository $cchRepository, CircuitDetailRepository $ccdRepository): JsonResponse
     {
         set_time_limit(0);
-        $endDate = new DateTime();
+        $endDate = new DateTime("now", new DateTimeZone("GMT"));
         $endDate->setTimestamp(intval($dayTs));
+        $endDate->setTime(23, 59, 59);
         $beginDate = clone $endDate;
         $beginDate = $beginDate->modify("-1 week");
         $beginDate->setTime(0,0,0);
