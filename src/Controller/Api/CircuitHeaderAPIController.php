@@ -58,7 +58,7 @@ class CircuitHeaderAPIController extends AbstractController
                 $min = $el->getCCHDateValMin();
                 $max = $el->getCCHDateValMax();
                 //todo add upper limit
-                return ($min > $minDay || $min == 0) ;
+                return ($min == 0 || $min < $minDay) && ($max == 0 || $max > $maxDay);
             });
             foreach ($validHeaders as $header) {
                 $linkedTars = array_filter($tars, function ($el) use ($header) {
