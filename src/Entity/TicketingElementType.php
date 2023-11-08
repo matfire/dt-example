@@ -31,11 +31,11 @@ class TicketingElementType
     #[ORM\Column(name:"TET_TreeNumber")]
     private ?int $TET_TreeNumber = null;
 
-    #[ORM\Column(name:"TET_BorderLeft")]
-    private ?int $TET_BorderLeft = null;
+    #[ORM\Column(name:"TET_BordeLeft")]
+    private ?int $TET_BordeLeft = null;
 
-    #[ORM\Column(name:"TET_BorderRight")]
-    private ?int $TET_BorderRight = null;
+    #[ORM\Column(name:"TET_BordeRight")]
+    private ?int $TET_BordeRight = null;
 
     #[ORM\Column(name:"TET_Level")]
     private ?int $TET_Level = null;
@@ -52,8 +52,8 @@ class TicketingElementType
     #[ORM\Column(nullable:true, name:"TVAT_ID")]
     private ?int $TVAT_ID = null;
 
-    #[ORM\Column(length: 50, name:"TET_AccountCode")]
-    private ?string $TET_AccountCode = null;
+    #[ORM\Column(length: 50, name:"TET_AccountingCode")]
+    private ?string $TET_AccountingCode = null;
 
     #[ORM\Column(type: Types::SMALLINT, name:"TET_ElementISTracable")]
     private ?int $TET_ElementIsTracable = null;
@@ -157,26 +157,26 @@ class TicketingElementType
         return $this;
     }
 
-    public function getTETBorderLeft(): ?int
+    public function getTETBordeLeft(): ?int
     {
-        return $this->TET_BorderLeft;
+        return $this->TET_BordeLeft;
     }
 
-    public function setTETBorderLeft(int $TET_BorderLeft): static
+    public function setTETBordeLeft(int $TET_BordeLeft): static
     {
-        $this->TET_BorderLeft = $TET_BorderLeft;
+        $this->TET_BordeLeft = $TET_BordeLeft;
 
         return $this;
     }
 
-    public function getTETBorderRight(): ?int
+    public function getTETBordeRight(): ?int
     {
-        return $this->TET_BorderRight;
+        return $this->TET_BordeRight;
     }
 
-    public function setTETBorderRight(int $TET_BorderRight): static
+    public function setTETBordeRight(int $TET_BordeRight): static
     {
-        $this->TET_BorderRight = $TET_BorderRight;
+        $this->TET_BordeRight = $TET_BordeRight;
 
         return $this;
     }
@@ -241,14 +241,14 @@ class TicketingElementType
         return $this;
     }
 
-    public function getTETAccountCode(): ?string
+    public function getTETAccountingCode(): ?string
     {
-        return $this->TET_AccountCode;
+        return $this->TET_AccountingCode;
     }
 
-    public function setTETAccountCode(string $TET_AccountCode): static
+    public function setTETAccountingCode(string $TET_AccountingCode): static
     {
-        $this->TET_AccountCode = $TET_AccountCode;
+        $this->TET_AccountingCode = $TET_AccountingCode;
 
         return $this;
     }

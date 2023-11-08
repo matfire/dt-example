@@ -49,8 +49,8 @@ class TicketingCashRegisterSession
     #[ORM\Column(name:"TCRS_TSSLinkID")]
     private ?int $TCRS_TSSLinkID = null;
 
-    #[ORM\Column(type: Types::TEXT, name:"TCRS_ControllerComments")]
-    private ?string $TCRS_ControllerComments = null;
+    #[ORM\Column(type: Types::TEXT, name:"TCRS_ControlerComments")]
+    private ?string $TCRS_ControlerComments = null;
 
     #[ORM\Column(type: Types::BIGINT, name:"TCRS_ValidationDate")]
     private ?string $TCRS_ValidationDate = null;
@@ -200,14 +200,14 @@ class TicketingCashRegisterSession
         return $this;
     }
 
-    public function getTCRSControllerComments(): ?string
+    public function getTCRSControlerComments(): ?string
     {
-        return $this->TCRS_ControllerComments;
+        return $this->TCRS_ControlerComments;
     }
 
-    public function setTCRSControllerComments(string $TCRS_ControllerComments): static
+    public function setTCRSControlerComments(string $TCRS_ControlerComments): static
     {
-        $this->TCRS_ControllerComments = $TCRS_ControllerComments;
+        $this->TCRS_ControlerComments = $TCRS_ControlerComments;
 
         return $this;
     }
