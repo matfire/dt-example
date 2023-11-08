@@ -45,4 +45,14 @@ class TicketingTransactionAggregateRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    /**
+     * @return TicketingTransactionAggregate[]
+     */
+    public function findByTCRSList(array $ids): array {
+        return $this->createQueryBuilder('t')
+        ->andWhere("t.TCRS_ID in (:ids)")
+        ->setParameter("ids", $ids)
+        ->getQuery()
+        ->getResult();
+    }
 }

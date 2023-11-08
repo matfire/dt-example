@@ -45,4 +45,14 @@ class TicketingElementTypeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    /**
+     * @return TicketingElementType[]
+     */
+    public function findByTETList(array $ids): array {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.TET_ID in (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -45,4 +45,16 @@ class TicketingCashRegisterSessionRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    /**
+     * @return TicketingCashRegisterSession[]
+     */
+    public function findByDate(int $siteId, int $begTs, int $endTs): array {
+        return $this->createQueryBuilder('c')
+            ->andWhere("c.SIT_ID = :sit_id")
+            ->andWhere("c.TCRS_DateStart >= :begin")
+            ->andWhere("c.TCRS_DateStop <= :end")
+            ->setParameters(["sit_id" => $siteId, "begin" => $begTs, "end" => $endTs])
+            ->getQuery()
+            ->getResult();
+    }
 }
