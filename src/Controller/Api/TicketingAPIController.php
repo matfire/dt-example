@@ -55,6 +55,6 @@ class TicketingAPIController extends AbstractController
             }) ?? 0);
             $tmpDate = $tmpDate->modify("+1 day");
         }
-        return $this->json(["status" => "ok", "res" => $results]);
+        return $this->json($results);
     }
 }
