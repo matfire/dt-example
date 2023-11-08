@@ -3,8 +3,6 @@ namespace App\Controller\Api;
 
 use App\Repository\BoxRepository;
 use App\Repository\LvbRepository;
-use DateTime;
-use DateTimeZone;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
