@@ -52,6 +52,6 @@ class LCDVAPIController extends AbstractController
                 array_push($currentDay, $el);
             }
         }
-        return $this->json(['status' => 'ok', 'res' => $res]);
+        return $this->json($res);
     }
 }
