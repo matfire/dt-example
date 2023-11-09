@@ -24,10 +24,14 @@ class CircuitDetailRepository extends ServiceEntityRepository
     /**
      * @return CircuitDetail[]
     */
-    public function findByCircuitHeader(int $cch_id): array {
-        return $this->createQueryBuilder('c')
+    public function findByCircuitHeader(int $cch_id, bool $sort=false): array {
+        $query = $this->createQueryBuilder('c')
             ->andWhere('c.CCH_ID = :cch_id')
-            ->setParameter('cch_id', $cch_id)
+            ->setParameter('cch_id', $cch_id);
+        if ($sort) {
+            $query->orderBy("c.CCD_Step", "ASC");
+        }
+        return $query
             ->getQuery()
             ->getResult();
     }
