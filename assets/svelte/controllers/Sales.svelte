@@ -15,7 +15,7 @@
             labels: [],
             datasets: [
                 {
-                    label: "Ventes",
+                    label: "Voyageurs",
                     backgroundColor: "green",
                     data: [],
                 },
