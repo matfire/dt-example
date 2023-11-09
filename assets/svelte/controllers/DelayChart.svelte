@@ -49,11 +49,11 @@
     let chart;
 
     function fillChart() {
-        options.data.labels = canvasData.res.labels;
+        options.data.labels = canvasData.labels;
         const delays = [];
         const advances = [];
         const onTime = [];
-        canvasData.res.data.forEach((day) => {
+        canvasData.data.forEach((day) => {
             let dayDelay = 0;
             let dayAdvance = 0;
             let dayOnTime = 0;
