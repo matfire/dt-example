@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\CircuitDetail;
+use App\Entity\Lcdv;
 use App\Repository\CircuitDetailRepository;
 use App\Repository\CircuitHeaderRepository;
 use App\Repository\LcdvRepository;
@@ -33,6 +35,16 @@ class VehicleController extends AbstractController
     #[Route('/bus/{cchid}')]
     public function busDetails(int $cchid, CircuitDetailRepository $ccdRepository, LcdvRepository $lcvdRepository): Response {
         $details = $ccdRepository->findByCircuitHeader($cchid, true);
-        return $this->render("vehicles/details.bus.html.twig", ["details" => $details]);
+        $detailsIds = array_map(function ($el) {
+            return $el->getCCDID();
+        }, $details);
+        $lcdvs = $lcvdRepository->findByCCDIDList($detailsIds);
+        $data = array_map(function (CircuitDetail $el) use ($lcdvs) {
+            $lcdv = array_filter($lcdvs, function ( Lcdv $l) use ($el) {
+                return $l->getCCDID() == $el->getCCDID();
+            });
+            return ["detail" => $el, "lcdv" => array_shift($lcdv)];
+        }, $details);
+        return $this->render("vehicles/details.bus.html.twig", ["data" => $data]);
     }
 }
