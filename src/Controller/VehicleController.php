@@ -18,12 +18,9 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 class VehicleController extends AbstractController
 {
     #[Route('/bus')]
-    public function bus(CircuitHeaderRepository $headerRepository, #[MapQueryParameter] int $d = null): Response
+    public function bus(CircuitHeaderRepository $headerRepository, #[MapQueryParameter] string $d = null): Response
     {
-        $date = new DateTime("now", new DateTimeZone("GMT"));
-        if (isset($d)) {
-            $date = $date->setTimestamp($d);
-        }
+        $date = new DateTime($d ?? "now", new DateTimeZone("GMT"));
         $begin = clone $date;
         $begin->setTime(0,0,0);
         $end = clone $date;

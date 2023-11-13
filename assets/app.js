@@ -11,3 +11,4 @@ import './bootstrap.js';
 import './styles/app.css';
 registerSvelteControllerComponents(require.context('./svelte/controllers', true, /\.svelte$/));
 import 'flowbite';
+import 'flowbite/dist/datepicker.js'
