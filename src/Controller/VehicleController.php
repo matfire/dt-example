@@ -26,7 +26,7 @@ class VehicleController extends AbstractController
         $end = clone $date;
         $end->setTime(23,59,59);
         $instanciatedBus = $headerRepository->findByProfileAndDate(425, 0, $begin->getTimestamp(), $end->getTimestamp());
-        return $this->render("vehicles/bus.html.twig", ["buses" => $instanciatedBus]);
+        return $this->render("vehicles/bus.html.twig", ["buses" => $instanciatedBus, "date" => $date->getTimestamp()]);
     }
 
     #[Route('/bus/{cchid}')]
