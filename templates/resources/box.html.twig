@@ -4,20 +4,23 @@
     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="table">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th scope="col" class="px-6 py-3">
+                <th class="px-6 py-3">
                     Box
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th class="px-6 py-3">
                     Date Derniere Transmission
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th class="px-6 py-3">
                     Etat
+                </th>
+                <th class="px-6 py-3">
+                    Actions
                 </th>
             </tr>
         </thead>
         <tbody>
             {% for box in boxes %}
-                <tr data-href="/resources/box/{{box.getBOXID()}}" class="bg-white cursor-pointer border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <tr class="bg-white cursor-pointer border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                     <td class="px-6 py-4">
                         {{box.getBOXID()}}
                     </td>
@@ -33,18 +36,11 @@
                         En Ligne
                     </td>
                     {% endif %}
+                    <td class="px-6 py-4">
+                        						<a class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" href="/resources/box/{{box.getBOXID()}}">Détails</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    document.querySelectorAll("tr[data-href]").forEach((el) => {
-        el.addEventListener("click", () => {
-            window.location = el.getAttribute("href")
-        })
-    })
-</script>
 {% endblock %}
