@@ -1,7 +1,11 @@
 {% extends "base.html.twig" %}
 
+		{% block styles %}
+			{{ encore_entry_link_tags('datatable') }}
+		{% endblock %}
+
 {% block body %}
-    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="table">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="table" data-table>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th class="px-6 py-3">
@@ -43,4 +47,8 @@
             {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+
+{% block scripts %}
+			{{ encore_entry_script_tags('datatable') }}
 {% endblock %}
