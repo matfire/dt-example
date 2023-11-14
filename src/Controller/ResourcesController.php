@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Lvb;
 use App\Repository\BoxRepository;
 use App\Repository\LvbRepository;
 use DateTime;
@@ -16,13 +17,15 @@ class ResourcesController extends AbstractController {
     public function boxResources(BoxRepository $boxRepository, LvbRepository $lvbRepository) {
         $date = new DateTime("now", new DateTimeZone("GMT"));
         $lvbs = $lvbRepository->findActiveOnDate(425, $date->getTimestamp());
-        $boxes = [];
-        foreach ($lvbs as $lvb) {
-            $box = $boxRepository->findByBoxId($lvb->getBOXID());
-            if (count($box) > 0) {
-                array_push($boxes, $box[0]);
-            }
-        }
+        $lvbIds = array_map(function (Lvb $el) {
+            return $el->getBOXID();
+        }, $lvbs);
+        $boxes = $boxRepository->findByBOXIDList($lvbIds);
         return $this->render("resources/box.html.twig", ["boxes" => $boxes, "factor" => 2, "currentTs" => $date->getTimestamp()]);
+    }
+
+    #[Route('/box/{boxId}')]
+    public function boxDetailResources(int $boxId) {
+        return $this->render("resources/details.box.html.twig");
     }
 }
