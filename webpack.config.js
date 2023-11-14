@@ -22,6 +22,11 @@ Encore
      */
     .addEntry('app', './assets/app.js')
 
+    /**
+     * Datatable script: import onto a page and bam!
+     */
+    .addEntry('datatable', './assets/datatable.js')
+
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
 
