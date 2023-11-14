@@ -34,6 +34,18 @@ class BoxRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Box[]
+     */
+    public function findByBOXIDList($îds)
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.BOX_ID in (:ids)')
+            ->setParameter('ids', $îds)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Box[] Returns an array of Box objects
     //     */
