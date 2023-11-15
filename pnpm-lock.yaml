@@ -11,6 +11,9 @@ dependencies:
   chartjs-plugin-zoom:
     specifier: ^2.0.1
     version: 2.0.1(chart.js@3.8.2)
+  datatables.net-buttons:
+    specifier: ^2.4.2
+    version: 2.4.2
   datatables.net-buttons-dt:
     specifier: ^2.4.2
     version: 2.4.2
