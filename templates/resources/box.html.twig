@@ -1,54 +1,54 @@
 {% extends "base.html.twig" %}
 
-		{% block styles %}
-			{{ encore_entry_link_tags('datatable') }}
-		{% endblock %}
+{% block styles %}
+	{{ encore_entry_link_tags('datatable') }}
+{% endblock %}
 
 {% block body %}
-    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="table" data-table>
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th class="px-6 py-3">
-                    Box
-                </th>
-                <th class="px-6 py-3">
-                    Date Derniere Transmission
-                </th>
-                <th class="px-6 py-3">
-                    Etat
-                </th>
-                <th class="px-6 py-3">
-                    Actions
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for box in boxes %}
-                <tr class="bg-white cursor-pointer border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td class="px-6 py-4">
-                        {{box.getBOXID()}}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{box.getBOXLastComDate()|date}}
-                    </td>
-                    {% if currentTs - box.getBOXLastComDate() > factor *  box.getBOXTransmissionSampleRate() %}
-                    <td class="px-6 py-4 bg-red-300">
-                        Hors Ligne
-                    </td>
-                    {% else %}
-                    <td class="px-6 py-4 bg-green-300">
-                        En Ligne
-                    </td>
-                    {% endif %}
-                    <td class="px-6 py-4">
-                        						<a class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" href="/resources/box/{{box.getBOXID()}}">Détails</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+	<table data-table>
+		<thead>
+			<tr>
+				<th>
+					Box
+				</th>
+				<th>
+					Date Derniere Transmission
+				</th>
+				<th>
+					Etat
+				</th>
+				<th>
+					Actions
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for box in boxes %}
+				<tr>
+					<td>
+						{{box.getBOXID()}}
+					</td>
+					<td>
+						{{box.getBOXLastComDate()|date}}
+					</td>
+					{% if currentTs - box.getBOXLastComDate() > factor *  box.getBOXTransmissionSampleRate() %}
+						<td class=" bg-red-300">
+							Hors Ligne
+						</td>
+					{% else %}
+						<td class=" bg-green-300">
+							En Ligne
+						</td>
+					{% endif %}
+					<td>
+						<a class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" href="/resources/box/{{box.getBOXID()}}">Détails</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 {% endblock %}
 
 {% block scripts %}
-			{{ encore_entry_script_tags('datatable') }}
+	{{ encore_entry_script_tags('datatable') }}
 {% endblock %}
