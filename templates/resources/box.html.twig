@@ -1,11 +1,12 @@
 {% extends "base.html.twig" %}
 
-{% block styles %}
+{# {% block styles %}
 	{{ encore_entry_link_tags('datatable') }}
-{% endblock %}
+{% endblock %} #}
 
 {% block body %}
-	<table data-table>
+    <div {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy']})}}>
+	<table data-datatable-target="table">
 		<thead>
 			<tr>
 				<th>
@@ -40,15 +41,17 @@
 							En Ligne
 						</td>
 					{% endif %}
-					<td>
+					<td align="right">
 						<a class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900" href="/resources/box/{{box.getBOXID()}}">Détails</a>
 					</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
+    </div>
 {% endblock %}
 
-{% block scripts %}
+{# {% block scripts %}
 	{{ encore_entry_script_tags('datatable') }}
 {% endblock %}
+ #}

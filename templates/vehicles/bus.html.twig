@@ -1,5 +1,4 @@
 {% extends "base.html.twig" %}
-
 {% block body %}
 	<form>
 		<div class="w-full flex justify-center items-center">
@@ -16,16 +15,17 @@
 	</form>
 	<p>Courses du
 		{{date|date}}</p>
-	<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="table">
-		<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+	<div {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy', 'pdf']})}} >
+	<table data-datatable-target="table">
+		<thead>
 			<tr>
-				<th scope="col" class="px-6 py-3">
+				<th scope="col">
 					Bus
 				</th>
-				<th scope="col" class="px-6 py-3">
+				<th scope="col">
 					Nom
 				</th>
-				<th scope="col" class="px-6 py-3">
+				<th scope="col">
 					Date Instantiation
 				</th>
 				<th>
@@ -35,14 +35,14 @@
 		</thead>
 		<tbody>
 			{% for bus in buses %}
-				<tr class="bg-white cursor-pointer border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-					<td class="px-6 py-4">
+				<tr>
+					<td>
 						{{bus.getCCHID()}}
 					</td>
-					<td class="px-6 py-4">
+					<td>
 						{{bus.getCCHLabel()}}
 					</td>
-					<td class="px-6 py-4">
+					<td>
 						{{bus.getCCHCreationDate()|date}}
 					</td>
 					<td>
@@ -52,6 +52,7 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	</div>
 	{% if buses is empty %}
 		<p class="text-center">Aucun résultat pour cette date...</p>
 	{% endif %}

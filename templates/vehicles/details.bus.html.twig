@@ -2,73 +2,66 @@
 
 {% block body %}
 	<div class="w-full flex flex-col md:flex-row h-full">
-		<div data-accordion="collapse" class="h-full w-full">
-			{% for element in data %}
-				{% set in = null %}
-				{% set out = null %}
-				{% set inDelay = null %}
-				{% set outDelay = null %}
-				{% if element.lcdv.getLCDVDateDo() != 0 %}
-					{% set in = element.lcdv.getLCDVDateDo() %}
-				{% else %}
-					{% set in = element.lcdv.getLCDVDateIn() %}
-				{% endif %}
-				{% if element.lcdv.getLCDVDateDoDelay() != 0 %}
-					{% set inDelay = element.lcdv.getLCDVDateDoDelay() %}
-				{% else %}
-					{% set inDelay = element.lcdv.getLCDVDateInDelay() %}
-				{% endif %}
-				{% if element.lcdv.getLCDVDateDone() != 0 %}
-					{% set out = element.lcdv.getLCDVDateDone() %}
-				{% else %}
-					{% set out = element.lcdv.getLCDVDateOut() %}
-				{% endif %}
-				{% if element.lcdv.getLCDVDateDoneDelay() != 0 %}
-					{% set outDelay = element.lcdv.getLCDVDateDoneDelay() %}
-				{% endif %}
-				<h2 id="accordion_header_{{element.detail.getCCDID()}}">
-					<button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3" data-accordion-target="#accordion_body_{{element.detail.getCCDID()}}" aria-expanded="true" aria-controls="accordion_body_{{element.detail.getCCDID()}}">
-						<span>{{element.detail.getCCDLabel()}}</span>
-						<svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 10 6">
-							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
-						</svg>
-					</button>
-				</h2>
-				<div id="accordion_body_{{element.detail.getCCDID()}}" class="hidden" aria-labelledby="accordion_header_{{element.detail.getCCDID()}}">
-					<div class="w-full flex flex-col md:flex-row justify-center items-center gap-4">
-						<div class="flex flex-col items-center shadow-md border-current border p-2">
-							<h3 class="font-semibold text-base lg:text-2xl">Depart</h3>
-							<span>
-								{{in|date}}
-							</span>
-						</div>
-						<div class="flex flex-col items-center shadow-md border-current border p-2">
-							<h3 class="font-semibold text-base lg:text-2xl">
-								{% if inDelay > 0 %}Retard{% else %}Avance
-								{% endif %}
-								Arrivée</h3>
-							<span>{{inDelay}}</span>
-						</div>
-						<div class="flex flex-col items-center shadow-md border-current border p-2">
-							<h3 class="font-semibold text-base lg:text-2xl">Depart</h3>
-							<span>
-								{{out|date}}
-							</span>
-						</div>
-						<div class="flex flex-col items-center shadow-md border-current border p-2">
-							<h3 class="font-semibold text-base lg:text-2xl">
-								{% if outDelay > 0 %}Retard{% else %}Avance
-								{% endif %}
-								Depart</h3>
-							<span>
-								{% if outDelay %}
-									{{outDelay}}{% else %}N/A
-								{% endif %}
-							</span>
-						</div>
-					</div>
-				</div>
-			{% endfor %}
+		<div class="h-full w-full" {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy']})}}>
+			<table data-datatable-target="table">
+				<thead>
+					<tr>
+						<th>
+							#
+						</th>
+						<th>
+							Arret
+						</th>
+						<th>
+							Horaire Théorique
+						</th>
+						<th>
+							Horaire Réel
+						</th>
+						<th>
+							Retard (arrivé)
+						</th>
+						<th>
+							Retard (départ)
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for element in data %}
+						{% set in = null %}
+						{% set out = null %}
+						{% set inDelay = null %}
+						{% set outDelay = null %}
+						{% if element.lcdv.getLCDVDateDo() != 0 %}
+							{% set in = element.lcdv.getLCDVDateDo() %}
+						{% else %}
+							{% set in = element.lcdv.getLCDVDateIn() %}
+						{% endif %}
+						{% if element.lcdv.getLCDVDateDoDelay() != 0 %}
+							{% set inDelay = element.lcdv.getLCDVDateDoDelay() %}
+						{% else %}
+							{% set inDelay = element.lcdv.getLCDVDateInDelay() %}
+						{% endif %}
+						{% if element.lcdv.getLCDVDateDone() != 0 %}
+							{% set out = element.lcdv.getLCDVDateDone() %}
+						{% else %}
+							{% set out = element.lcdv.getLCDVDateOut() %}
+						{% endif %}
+						{% if element.lcdv.getLCDVDateDoneDelay() != 0 %}
+							{% set outDelay = element.lcdv.getLCDVDateDoneDelay() %}
+						{% endif %}
+						<tr>
+							<td>{{element.detail.getCCDID()}}</td>
+							<td>{{element.detail.getCCDLabel()}}</td>
+							<td>{{element.detail.getCCDDateToDoMin()|date}}</td>
+							<td>{{in|date}}</td>
+							<td>{{inDelay}}</td>
+							<td>{{outDelay}}</td>
+
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
 		<div class="w-full">
 			<div class="sticky top-0">
@@ -77,5 +70,3 @@
 		</div>
 	</div>
 {% endblock %}
-
-{% block scripts %}{% endblock %}
