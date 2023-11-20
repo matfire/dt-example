@@ -8,7 +8,6 @@ import './bootstrap.js';
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
+import './styles/app.scss';
+import bootstrap from "bootstrap"
 registerSvelteControllerComponents(require.context('./svelte/controllers', true, /\.svelte$/));
-import 'flowbite';
-import 'flowbite/dist/datepicker.js'

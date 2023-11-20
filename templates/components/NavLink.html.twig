@@ -1,0 +1,3 @@
+<li class="{% if dropdown == 0 %}nav-item{% endif %}">
+	<a href="{{link}}" class="{% if dropdown %}dropdown-item{% else %}nav-link{% endif %} {% if app.request.pathinfo == link and dropdown == 0 %}active{% endif %}">{{text}}</a>
+</li>

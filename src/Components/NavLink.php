@@ -3,7 +3,8 @@ namespace App\Components;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent]
-class SidebarLink {
+class NavLink {
     public string $link = "#";
     public string $text = "";
+    public bool $dropdown = false;
 }

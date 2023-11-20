@@ -3,6 +3,6 @@ namespace App\Components;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent]
-class Sidebar {
+class Nav {
     public string $id = "drawer-navigation";
 }

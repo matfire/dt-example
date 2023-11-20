@@ -1,16 +1,18 @@
 import { Controller } from "@hotwired/stimulus";
-import $ from 'jquery'
 import '../styles/datatables.css'
+import $ from 'jquery'
 import jszip from 'jszip';
 import pdfmake from 'pdfmake';
 import DataTable from 'datatables.net-dt'
+import 'datatables.net-bs5'
 import 'datatables.net-buttons-dt';
 import 'datatables.net-buttons/js/buttons.colVis.mjs';
-import 'datatables.net-buttons/js/buttons.html5.mjs';
+//TODO fix pdf import
+//import 'datatables.net-buttons/js/buttons.html5.mjs';
 import 'datatables.net-buttons/js/buttons.print.mjs';
 import 'datatables.net-fixedcolumns-dt';
 import 'datatables.net-fixedheader-dt';
-/* stimulusFetch: 'lazy' */
+
 export default class extends Controller {
     static targets = ["table"]
     static values = {
@@ -27,7 +29,7 @@ export default class extends Controller {
                 infoEmpty: "Affiche 0 éléments sur 0",
                 search: "Chercher:",
                 zeroRecords: "Aucun résultat corréspond à cette recherche",
-                lengthMenu: "Affiche _MENU_ éléments",
+                lengthMenu: "Afficher _MENU_ éléments",
                 paginate: {
                     first:"Début",
                     last:"Fin",
