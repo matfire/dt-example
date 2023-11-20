@@ -1,5 +1,35 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-
-{% endblock %}
+	<div class="row">
+		<div class="col-lg-6 col-sm-12">
+			<div class="card">
+				<div class="card-body">
+					<h1 class="card-title">Bus {{vehicle.getVHCLabel()}}</h1>
+					<p>Crée le
+						<span>{{vehicle.getVHCCreationDate()|date}}</span>
+					</p>
+					<p>Dernière mise à jour le
+						<span>{{vehicle.getVHCUpdateDate()|date}}</span>
+					</p>
+					{% if vehicle.getVHCDateIn() != 0 and vehicle.getVHCDateOut() != 0 %}
+						<p>En fonction depuis le
+							<span>{{vehicle.getVHCDateIn()|date}}</span>
+							et jusqu'au
+							<span>{{vehicle.getVHCDateOut()|date}}</span>
+						{% endif %}
+				</div>
+			</div>
+		</div>
+        <div class="col-lg-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Boitier {{box.getBOXID()}}</h2>
+                    <p>Dernière transmission le <span>{{box.getBOXLastComDate()|date}}</span></p>
+                    <p>Dernière position: {{box.getBOXLastX()}} lat, {{box.getBOXLastY()}} lon
+                    <p>Derniere direction: {{box.getBOXLastHeading()}}
+                </div>
+            </div>
+        </div>
+	</div>
+	{% endblock %}

@@ -39,6 +39,27 @@ class LvbRepository extends ServiceEntityRepository
         return $queryObj->getResult();
     }
 
+    /**
+     * @return Lvb[]
+     */
+    public function findByBOXID(int $boxId, int $ts = null): array {
+        $query = $this->createQueryBuilder('l')
+            ->andWhere('l.BOX_ID = :id')
+            ->setParameter('id', $boxId);
+        if ($ts) {
+            $condition = $query->expr()->andX();
+            $maxSide = $query->expr()->orX();
+            $maxSide->add('l.LVB_DateOut < :date');
+            $maxSide->add('l.LVB_DateOut = 0');
+            $condition->add('l.LVB_DateIn < :date');
+            $condition->add($maxSide);
+            $query->andWhere($condition)
+            ->setParameter('date', $ts);
+        }
+        return $query->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Lvb[] Returns an array of Lvb objects
 //     */

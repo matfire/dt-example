@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Lvb;
 use App\Repository\BoxRepository;
 use App\Repository\LvbRepository;
+use App\Repository\VehicleRepository;
 use DateTime;
 use DateTimeZone;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,7 +26,14 @@ class ResourcesController extends AbstractController {
     }
 
     #[Route('/box/{boxId}')]
-    public function boxDetailResources(int $boxId) {
-        return $this->render("resources/details.box.html.twig");
+    public function boxDetailResources(int $boxId, BoxRepository $boxRepository, LvbRepository $lvbRepository, VehicleRepository $vehicleRepository) {
+
+        $box = $boxRepository->findByBoxId($boxId);
+        $lvbs = $lvbRepository->findByBOXID($box[0]->getBOXID(), (new DateTime("now", new DateTimeZone("GMT")))->getTimestamp());
+        usort($lvbs, function (Lvb $a, Lvb $b) {
+            return $b->getLVBID() - $a->getLVBID();
+        });
+        $vehicle = $vehicleRepository->findOneBy(["VHC_ID" => $lvbs[0]->getVHCID()]);
+        return $this->render("resources/details.box.html.twig", ["box" => $box[0], "vehicle" => $vehicle]);
     }
 }
