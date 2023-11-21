@@ -5,7 +5,7 @@
 {% endblock %} #}
 
 {% block body %}
-    <div {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy']})}}>
+    <div {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy'], 'disabled:': [3]})}}>
 	<table data-datatable-target="table" class="col-12">
 		<thead>
 			<tr>
@@ -18,7 +18,7 @@
 				<th>
 					Etat
 				</th>
-				<th>
+				<th align="right">
 					Actions
 				</th>
 			</tr>
