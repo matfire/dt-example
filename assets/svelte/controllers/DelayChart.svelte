@@ -1,21 +1,17 @@
 <script>
     import { onMount } from "svelte";
     import Chart from "chart.js/auto";
-    import zoomPlugin from "chartjs-plugin-zoom";
     import Input from "../components/Input.svelte";
     import LoadingScreen from "../components/LoadingScreen.svelte";
-
-    Chart.register(zoomPlugin);
+    import { DateTime } from "luxon";
 
     export let siteId;
-    export let beginTs;
-    export let endTs;
 
     let loading = true;
-    let delayThreshold = null;
-    let advanceThreshold = null;
-    let beginDate = "";
-    let endDate = "";
+    export let delayThreshold = 0;
+    export let advanceThreshold = 0;
+    let canvasId = "delay-chart";
+    let canvasData = {};
     let options = {
         type: "bar",
         data: {
@@ -24,128 +20,129 @@
                 {
                     label: "retards",
                     data: [],
+                    backgroundColor: "orange",
+                },
+                {
+                    label: "à l'heure",
+                    data: [],
+                    backgroundColor: "green",
                 },
                 {
                     label: "avances",
                     data: [],
+                    backgroundColor: "red",
                 },
             ],
         },
         options: {
-            plugins: {
-                zoom: {
-                    zoom: {
-                        wheel: {
-                            enabled: true,
-                        },
-                        pinch: {
-                            enabled: true,
-                        },
-                        mode: "xy",
-                    },
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    max: 100,
+                    stacked: true,
                 },
             },
         },
     };
     let chart;
 
-    async function loadData(siteId, begin, end) {
-        const res = await fetch(
-            `/api/lcdv/range?siteId=${siteId}&beginTs=${begin}&endTs=${end}`
-        );
-        const data = await res.json();
-        options.data.labels = data.res.labels;
+    function fillChart() {
+        options.data.labels = canvasData.labels;
         const delays = [];
         const advances = [];
-        data.res.data.forEach((day) => {
+        const onTime = [];
+        canvasData.data.forEach((day) => {
             let dayDelay = 0;
             let dayAdvance = 0;
+            let dayOnTime = 0;
             day.forEach((point) => {
-                if (point.LCDV_DateInDelay < 0) {
-                    dayAdvance += point.LCDV_DateInDelay;
+                const entry =
+                    point.LCDV_DateDo !== 0
+                        ? point.LCDV_DateDoDelay
+                        : point.LCDV_DateInDelay;
+                const exit =
+                    point.LCDV_DateDone !== 0
+                        ? point.LCDV_DateDoneDelay
+                        : point.LCDV_DateOut;
+
+                if (
+                    entry < 0 && Math.abs(entry) >= advanceThreshold &&
+                    exit > 0 && exit >= delayThreshold
+                ) {
+                    dayOnTime++;
+                    return;
+                }
+                // circuit start
+                if (point.LCDV_DateIn === 0 && point.LCDV_DateDo === 0) {
+                    if (exit >= delayThreshold) {
+                        dayDelay++;
+                    } else if (Math.abs(exit) >= advanceThreshold) {
+                        dayAdvance++;
+                    } else {
+                        dayOnTime++;
+                    }
+                    return;
+                }
+                // circuit end
+                if (point.LCDV_DateDone === 0 && point.LCDV_DateOut === 0) {
+                    if (entry >= delayThreshold) {
+                        dayDelay++;
+                    } else if (Math.abs(entry) >= advanceThreshold) {
+                        dayAdvance++;
+                    } else {
+                        dayOnTime++;
+                    }
+                }
+                if (exit > 0 && exit >= delayThreshold) {
+                    dayDelay++;
+                } else if (exit < 0 && Math.abs(exit) >= advanceThreshold) {
+                    dayAdvance++;
                 } else {
-                    dayDelay += point.LCDV_DateInDelay;
+                    dayOnTime++;
                 }
             });
-            delays.push(dayDelay / 60);
-            advances.push(Math.abs(dayAdvance / 60));
+            const totalDay = dayDelay + dayAdvance + dayOnTime;
+            delays.push(((dayDelay * 100) / totalDay).toFixed(2));
+            advances.push(((dayAdvance * 100) / totalDay).toFixed(2));
+            onTime.push(((dayOnTime * 100) / totalDay).toFixed(2));
         });
         options.data.datasets[0].data = [...delays];
-        options.data.datasets[1].data = [...advances];
-        options.data.datasets[0].backgroundColor = Array(
-            options.data.datasets[0].data.length
-        ).fill("gray");
-        options.data.datasets[1].backgroundColor = Array(
-            options.data.datasets[1].data.length
-        ).fill("gray");
+        options.data.datasets[1].data = [...onTime];
+        options.data.datasets[2].data = [...advances];
+        if (chart) {
+            chart.update();
+            loading = false;
+        }
     }
 
-    function colorBars() {
-        if (delayThreshold) {
-            options.data.datasets[0].backgroundColor =
-                options.data.datasets[0].data.map((el) =>
-                    el > delayThreshold ? "orange" : "green"
-                );
-        }
-        if (advanceThreshold) {
-            options.data.datasets[1].backgroundColor =
-                options.data.datasets[1].data.map((el) =>
-                    el > advanceThreshold ? "red" : "blue"
-                );
-        }
-        chart.update();
-    }
-
-    async function handleDateSelect() {
-        if (new Date(beginDate).getTime() > new Date(endDate).getTime()) {
-            alert(
-                "la date de début de selection ne peut pas être supérieure à la date de fin de selection"
-            );
-            return;
-        }
+    async function loadData() {
         loading = true;
-        const beTs = new Date(beginDate).getTime() / 1000;
-        const enTs = new Date(endDate).getTime() / 1000;
-        await loadData(siteId, beTs, enTs);
-        colorBars();
-        loading = false;
+        const begin = DateTime.now().setZone("GMT");
+        const res = await fetch(
+            `/api/lcdv/range?siteId=${siteId}&dayTs=${1693785600}`
+        );
+        const data = await res.json();
+        canvasData = data;
+        fillChart();
     }
 
     $: if (delayThreshold || advanceThreshold) {
-        colorBars();
+        fillChart();
     }
-    $: onMount(async () => {
-        await loadData(siteId, beginTs, endTs);
-        chart = new Chart(document.getElementById("delay-chart"), options);
-        const begDate = new Date(beginTs * 1000);
-        const enDate = new Date(endTs * 1000);
-        beginDate = `${begDate.getFullYear()}-${(begDate.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}-${begDate
-            .getDate()
-            .toString()
-            .padStart(2, "0")}`;
-        endDate = `${enDate.getFullYear()}-${(enDate.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}-${enDate.getDate().toString().padStart(2, "0")}`;
+    onMount(async () => {
+        await loadData();
+        chart = new Chart(document.getElementById(canvasId), options);
         loading = false;
     });
 </script>
 
-<div class="flex flex-col w-full relative">
+<div class="d-flex flex-column  w-100 position-relative">
     {#if loading}
         <LoadingScreen />
     {/if}
-    <div class="w-full flex justify-between">
-        <Input label="Début sélection" type="date" bind:value={beginDate} />
-        <Input label="Fin sélection" type="date" bind:value={endDate} />
-        <button
-            type="button"
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            on:click={handleDateSelect}>Filtrer</button
-        >
-    </div>
-    <div class="w-full flex justify-between">
+    <div class="w-100 d-flex justify-content-center ">
         <Input label="seuil rétard" type="number" bind:value={delayThreshold} />
         <Input
             label="seuil avance"
@@ -153,5 +150,11 @@
             bind:value={advanceThreshold}
         />
     </div>
-    <canvas id="delay-chart" />
+    <canvas id={canvasId} />
+    <button
+    type="button"
+    class="btn btn-primary"
+    disabled={loading}
+    on:click={loadData}>Mettre à jour</button
+>
 </div>

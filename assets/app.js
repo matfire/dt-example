@@ -8,6 +8,6 @@ import './bootstrap.js';
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
-import 'flowbite';
+import './styles/app.scss';
+import bootstrap from "bootstrap"
 registerSvelteControllerComponents(require.context('./svelte/controllers', true, /\.svelte$/));

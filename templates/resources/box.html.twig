@@ -1,0 +1,57 @@
+{% extends "base.html.twig" %}
+
+{# {% block styles %}
+	{{ encore_entry_link_tags('datatable') }}
+{% endblock %} #}
+
+{% block body %}
+    <div {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy'], 'disabled:': [3]})}}>
+	<table data-datatable-target="table" class="col-12">
+		<thead>
+			<tr>
+				<th>
+					Box
+				</th>
+				<th>
+					Date Derniere Transmission
+				</th>
+				<th>
+					Etat
+				</th>
+				<th align="right">
+					Actions
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for box in boxes %}
+				<tr>
+					<td>
+						{{box.getBOXID()}}
+					</td>
+					<td>
+						{{box.getBOXLastComDate()|date}}
+					</td>
+					{% if currentTs - box.getBOXLastComDate() > factor *  box.getBOXTransmissionSampleRate() %}
+						<td class=" bg-red-300">
+							Hors Ligne
+						</td>
+					{% else %}
+						<td class=" bg-green-300">
+							En Ligne
+						</td>
+					{% endif %}
+					<td align="right">
+						<a class="btn btn-primary " href="/resources/box/{{box.getBOXID()}}">Détails</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+    </div>
+{% endblock %}
+
+{# {% block scripts %}
+	{{ encore_entry_script_tags('datatable') }}
+{% endblock %}
+ #}

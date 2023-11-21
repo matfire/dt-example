@@ -1,0 +1,56 @@
+{% extends "base.html.twig" %}
+{% block body %}
+	<form>
+		<div class="row align-items-center">
+			<div class="col row">
+				<label for="d" class="col-sm-2 col-form-label">Date</label>
+				<div class="col-sm-10">
+					<input type="date" name="d" class="form-control" id="d">
+				</div>
+			</div>
+			<div class="col">
+				<button type="submit" type="button" class="btn btn-primary">Selectionner</button>
+			</div>
+		</div>
+	</form>
+	<p>Courses du
+		{{date|date('d M Y')}}</p>
+	<div {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy', 'pdf']} )}}>
+		<table data-datatable-target="table" class="col-12">
+			<thead>
+				<tr>
+					<th scope="col">
+						Bus
+					</th>
+					<th scope="col">
+						Nom
+					</th>
+					<th scope="col">
+						Date Instantiation
+					</th>
+					<th>
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for bus in buses %}
+					<tr>
+						<td>
+							{{bus.getCCHID()}}
+						</td>
+						<td>
+							{{bus.getCCHLabel()}}
+						</td>
+						<td>
+							{{bus.getCCHCreationDate()|date}}
+						</td>
+						<td>
+							<a class="btn btn-primary" href="/vehicles/bus/{{bus.getCCHID()}}">Détails</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

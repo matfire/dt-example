@@ -1,0 +1,72 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+	<div class="container-fluid  mx-auto row">
+		<div class="col-lg-6 col-sm-12" {{ stimulus_controller('datatable', {'buttons': ['csv', 'copy']})}}>
+			<table data-datatable-target="table" class="w-100">
+				<thead>
+					<tr>
+						<th>
+							#
+						</th>
+						<th>
+							Arret
+						</th>
+						<th>
+							Horaire Théorique
+						</th>
+						<th>
+							Horaire Réel
+						</th>
+						<th>
+							Retard (arrivé)
+						</th>
+						<th>
+							Retard (départ)
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for element in data %}
+						{% set in = null %}
+						{% set out = null %}
+						{% set inDelay = null %}
+						{% set outDelay = null %}
+						{% if element.lcdv.getLCDVDateDo() != 0 %}
+							{% set in = element.lcdv.getLCDVDateDo() %}
+						{% else %}
+							{% set in = element.lcdv.getLCDVDateIn() %}
+						{% endif %}
+						{% if element.lcdv.getLCDVDateDoDelay() != 0 %}
+							{% set inDelay = element.lcdv.getLCDVDateDoDelay() %}
+						{% else %}
+							{% set inDelay = element.lcdv.getLCDVDateInDelay() %}
+						{% endif %}
+						{% if element.lcdv.getLCDVDateDone() != 0 %}
+							{% set out = element.lcdv.getLCDVDateDone() %}
+						{% else %}
+							{% set out = element.lcdv.getLCDVDateOut() %}
+						{% endif %}
+						{% if element.lcdv.getLCDVDateDoneDelay() != 0 %}
+							{% set outDelay = element.lcdv.getLCDVDateDoneDelay() %}
+						{% endif %}
+						<tr>
+							<td>{{element.detail.getCCDID()}}</td>
+							<td>{{element.detail.getCCDLabel()}}</td>
+							<td>{{element.detail.getCCDDateToDoMin()|date}}</td>
+							<td>{{in|date}}</td>
+							<td>{{inDelay}}</td>
+							<td>{{outDelay}}</td>
+
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="col-lg-6 col-sm-12">
+			<div class="position-sticky top-0">
+				<p>La Mappe Ici</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}

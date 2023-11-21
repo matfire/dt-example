@@ -4,10 +4,10 @@
 
 <div
     transition:fade
-    class="w-full h-full flex flex-col justify-center items-center absolute top-0 left-0 bg-white/70"
+    class="w-100 h-100 d-flex flex-column justify-content-center align-items-center position-absolute top-0 left-0 bg-white bg-opacity-75"
 >
     <p>On recupère les données, veuillez patienter...</p>
-    <div
-        class="border-black h-10 w-10 animate-spin rounded-full border-8 border-t-blue-600"
-    />
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
 </div>
